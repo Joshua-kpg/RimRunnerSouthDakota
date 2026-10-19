@@ -305,6 +305,9 @@ def merge(site, ledger, finals):
             continue
         if f["date"] < site.season_start:
             c["ignored"] += 1; continue
+        # a school listed against itself (seen in SDHSAA/GoBound rows) is never a real game
+        if f["homeMp"] == f["awayMp"] or (lh and la and site.mp2slug[f["homeMp"]] == site.mp2slug[f["awayMp"]]):
+            c["ignored"] += 1; continue
         # South Dakota: an SDHSAA team may not count a game before the SDHSAA first allowable contest (Thu Dec 10, 2026, all classes); games between two non-SDHSAA schools still count.
         _need = [SDHSAA_FIRST_GAME[d] for d in ((site.slug2team.get(site.mp2slug.get(m)) or {}).get("division", 99) for m in (f["homeMp"], f["awayMp"])) if d in SDHSAA_FIRST_GAME]
         if _need and f["date"] < max(_need):
